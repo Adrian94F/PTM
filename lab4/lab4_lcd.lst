@@ -1,0 +1,155 @@
+A51 MACRO ASSEMBLER  LAB4_LCD                                                             04/09/2015 19:18:56 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.00d
+OBJECT MODULE PLACED IN .\lab4_lcd.obj
+ASSEMBLER INVOKED BY: C:\Keil\C51\BIN\A51.EXE E:\lab4_lcd.asm SET(SMALL) DEBUG PRINT(.\lab4_lcd.lst) OBJECT(.\lab4_lcd.o
+                      bj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ;----------------
+                       2     ; stale
+                       3     ;----------------
+                       4                                               ;adresy do:
+  FF2C                 5     WR_CMD  EQU 0FF2CH        ; zapisu komendy
+  FF2D                 6     WR_DAT  EQU 0FF2DH        ;     zapisu danych
+  FF2E                 7     RD_ST   EQU 0FF2EH        ; odczytu stanu
+  FF2F                 8     RD_DAT  EQU 0FF2FH        ; odczytu danych
+                       9     
+0000                  10     ORG 0
+0000                  11     start:
+0000 120039           12             lcall init
+0003 7448             13             MOV             A, #'H'
+0005 120060           14             LCALL wrDat
+0008 7465             15             MOV             A, #'e'
+000A 120060           16             LCALL wrDat
+000D 7479             17             MOV             A, #'y'
+000F 120060           18             LCALL wrDat
+0012 7420             19             MOV             A, #' '
+0014 120060           20             LCALL wrDat
+0017 743A             21             MOV             A, #':'
+0019 120060           22             LCALL wrDat
+001C 742D             23             MOV             A, #'-'
+001E 120060           24             LCALL wrDat
+0021 7429             25             MOV             A, #')'
+0023 120060           26             LCALL wrDat
+                      27     
+0026 900082           28             MOV             DPTR, #hello
+0029 12002E           29             LCALL   putStr
+002C 80FE             30             SJMP    $
+                      31     
+                      32     ;--------------------
+                      33     ; PUT STRING     DPTR - string, R1- licznik
+                      34     ;--------------------
+002E                  35     putStr:
+002E E4               36             CLR             A
+002F 93               37             MOVC    A,@A+DPTR
+0030 6006             38             JZ              continue
+0032 120060           39             LCALL   wrDat
+0035 A3               40             INC             DPTR
+0036 80F6             41             JMP             putStr
+0038                  42     continue:       
+0038 22               43             RET
+                      44     ;--------------------
+                      45     ; INIT LCD
+                      46     ;--------------------
+0039                  47     init:
+0039 7438             48             MOV             A, #038H                        
+003B 12004D           49             LCALL   wrCmd
+003E 7401             50             MOV             A, #01H                 
+0040 12004D           51             LCALL   wrCmd
+0043 22               52             RET
+                      53     ;--------------------
+                      54     ; SPRAWDZENIE CZY ZAJETY
+                      55     ;--------------------
+0044                  56     cBusy:
+0044 C0E0             57             PUSH    ACC
+A51 MACRO ASSEMBLER  LAB4_LCD                                                             04/09/2015 19:18:56 PAGE     2
+
+                      58     
+0046                  59     cBusy_w:
+0046 E0               60             MOVX    A, @DPTR
+0047 20E7FC           61             JB              ACC.7, cBusy_w
+                      62     
+004A D0E0             63             POP             ACC
+004C 22               64             RET
+                      65     ;--------------------
+                      66     ; WYSLANIE KOMENDY        A - komenda
+                      67     ;--------------------
+004D                  68     wrCmd:
+004D C082             69             PUSH    DPL
+004F C083             70             PUSH    DPH
+0051 90FF2E           71             MOV             DPTR, #RD_ST
+0054 120044           72             LCALL   cBusy
+0057 90FF2C           73             MOV             DPTR, #WR_CMD   
+005A F0               74             MOVX    @DPTR, A
+005B D083             75             POP             DPH
+005D D082             76             POP             DPL
+005F 22               77             RET
+                      78     ;--------------------
+                      79     ; WYSLANIE DANYCH         A - dane
+                      80     ;--------------------
+0060                  81     wrDat:
+0060 C082             82             PUSH    DPL
+0062 C083             83             PUSH    DPH
+0064 90FF2E           84             MOV             DPTR, #RD_ST
+0067 120044           85             LCALL   cBusy
+006A 90FF2D           86             MOV             DPTR, #WR_DAT
+006D F0               87             MOVX    @DPTR, A
+006E D083             88             POP             DPH
+0070 D082             89             POP             DPL
+0072 22               90             RET
+                      91     ;--------------------
+                      92     ; ODCZYT STANU    A - stan
+                      93     ;--------------------
+0073                  94     rdCmd:
+0073 C0E0             95             PUSH    ACC
+0075 90FF2E           96             MOV             DPTR, #RD_ST
+0078 120044           97             LCALL   cBusy
+007B D0E0             98             POP             ACC
+007D 90FF2E           99             MOV             DPTR, #RD_ST
+0080 E0              100             MOVX    A,@DPTR
+0081 22              101             RET
+                     102     
+0082                 103     hello:
+0082 4E657665        104             DB 'Never gonna give you up!',0
+0086 7220676F                
+008A 6E6E6120                
+008E 67697665                
+0092 20796F75                
+0096 20757021                
+009A 00                      
+                     105     
+                     106     END
+A51 MACRO ASSEMBLER  LAB4_LCD                                                             04/09/2015 19:18:56 PAGE     3
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+CBUSY. . . . . . .  C ADDR   0044H   A   
+CBUSY_W. . . . . .  C ADDR   0046H   A   
+CONTINUE . . . . .  C ADDR   0038H   A   
+DPH. . . . . . . .  D ADDR   0083H   A   
+DPL. . . . . . . .  D ADDR   0082H   A   
+HELLO. . . . . . .  C ADDR   0082H   A   
+INIT . . . . . . .  C ADDR   0039H   A   
+PUTSTR . . . . . .  C ADDR   002EH   A   
+RDCMD. . . . . . .  C ADDR   0073H   A   
+RD_DAT . . . . . .  N NUMB   FF2FH   A   
+RD_ST. . . . . . .  N NUMB   FF2EH   A   
+START. . . . . . .  C ADDR   0000H   A   
+WRCMD. . . . . . .  C ADDR   004DH   A   
+WRDAT. . . . . . .  C ADDR   0060H   A   
+WR_CMD . . . . . .  N NUMB   FF2CH   A   
+WR_DAT . . . . . .  N NUMB   FF2DH   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

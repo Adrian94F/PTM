@@ -1,0 +1,91 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                        04/08/2015  18:25:14  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+E:\KEIL_V5\C51\BIN\BL51.EXE lab3-timer.obj TO lab3-timer RAMSIZE (256)
+
+
+INPUT MODULES INCLUDED:
+  lab3-timer.obj (LAB3_TIMER)
+
+
+LINK MAP OF MODULE:  lab3-timer (LAB3_TIMER)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0050H     ABSOLUTE     
+
+
+
+SYMBOL TABLE OF MODULE:  lab3-timer (LAB3_TIMER)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        LAB3_TIMER
+  D:00E0H         SYMBOL        ACC
+  C:0027H         SYMBOL        CONTINUE
+  N:0030H         SYMBOL        COUNT
+  B:00A8H.7       SYMBOL        EA
+  B:00A8H.1       SYMBOL        ET0
+  C:0036H         SYMBOL        INIT_TIMER
+  N:3CB0H         SYMBOL        LOAD
+  C:002FH         SYMBOL        LOOP
+  D:0090H         SYMBOL        P1
+  D:00D0H         SYMBOL        PSW
+  N:0031H         SYMBOL        SEC
+  C:002CH         SYMBOL        START
+  B:0088H.5       SYMBOL        TF0
+  D:008CH         SYMBOL        TH0
+  N:0032H         SYMBOL        TIME
+  D:008AH         SYMBOL        TL0
+  D:0089H         SYMBOL        TMOD
+  B:0088H.4       SYMBOL        TR0
+  C:0000H         LINE#         8
+  C:000BH         LINE#         15
+  C:000DH         LINE#         16
+  C:000FH         LINE#         18
+  C:0012H         LINE#         19
+  C:0015H         LINE#         21
+  C:0018H         LINE#         22
+  C:001BH         LINE#         23
+  C:001DH         LINE#         25
+  C:001FH         LINE#         26
+  C:0021H         LINE#         27
+  C:0024H         LINE#         28
+BL51 BANKED LINKER/LOCATER V6.22                                                      04/08/2015  18:25:14  PAGE 2
+
+
+  C:0027H         LINE#         31
+  C:0029H         LINE#         32
+  C:002BH         LINE#         33
+  C:002CH         LINE#         39
+  C:002FH         LINE#         41
+  C:0031H         LINE#         42
+  C:0032H         LINE#         43
+  C:0034H         LINE#         44
+  C:0036H         LINE#         48
+  C:0039H         LINE#         49
+  C:003CH         LINE#         51
+  C:003EH         LINE#         52
+  C:0041H         LINE#         53
+  C:0044H         LINE#         54
+  C:0047H         LINE#         56
+  C:0049H         LINE#         57
+  C:004BH         LINE#         59
+  C:004DH         LINE#         60
+  C:004FH         LINE#         62
+  -------         ENDMOD        LAB3_TIMER
+
+******************************************************************************
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 0047H BYTE ( 3%) *
+******************************************************************************
+
+Program Size: data=8.0 xdata=0 code=80
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

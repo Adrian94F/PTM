@@ -1,0 +1,150 @@
+A51 MACRO ASSEMBLER  LAB2                                                                 03/26/2015 15:38:24 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02b
+OBJECT MODULE PLACED IN lab2.OBJ
+ASSEMBLER INVOKED BY: E:\Keil_v5\C51\BIN\A51.EXE lab2.a51 SET(SMALL) DEBUG EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG 0
+0000 7830              2             MOV             R0,     #30H            ; w R0 ustawiamy wartosc 30hex - poczatek b
+                             loku zrodlowego
+0002 7940              3             MOV             R1, #40H                ; w R1 40hex - poczatek docelowego
+0004 7A05              4             MOV             R2, #5                  ; w R2 5 - dlugosc bloku pamieci do przekop
+                             iowania
+0006 120025            5             LCALL   iram_iram               ; wywolujemy odpowiednia procedure
+                       6     
+0009 7830              7             MOV             R0, #30H                ; w R0 ustawiamy wartosc 30hex - poczatek b
+                             loku zrodlowego
+000B 908000            8             MOV             DPTR, #8000H    ; w DPTR 8000hex - poczatek docelowego
+000E 7A05              9             MOV             R2, #5                  ; w R2 5 - dlugosc bloku pamieci do przekop
+                             iowania
+0010 12002C           10             LCALL   iram_xram               ; wywolujemy odpowiednia procedure
+                      11             
+0013 120033           12             LCALL   count_not_zeros ; wywolujemy procedure liczaca niezerowe elementy w pamieci
+                      13                                                             ;  od adresu 30 
+                      14                                                             ;  w rejestrze R2 pozostanie ich li
+                             czba
+                      15                                                             
+0016 7B80             16             MOV             R3, #80H                ; w R3 i R4 ustawiamy 
+0018 7C00             17             MOV             R4, #0H                 ;  poczatek bloku zrodlowego
+001A 7D00             18             MOV             R5, #0          ; w R3 i R4 ustawiamy 
+001C 7E05             19             MOV             R6, #5H                 ;  poczatek bloku docelowego
+001E 7AEE             20             MOV             R2, #0EEH                       ; w R2 5 - dlugosc bloku pamieci do
+                              przekopiowania
+0020 120040           21             LCALL   xram_xram               ; wywolujemy odpowiednia procedure
+                      22             
+0023 80FE             23             SJMP    $                               ; "skok" w miejsce tego polecenia - wykonuj
+                             e sie bez przerwy
+                      24     
+                      25     ;----------------------------------------------------------------
+                      26     ; kopiowanie bloku w obrebie pamieci wewnetrznej
+                      27     ; R0 - src      R1 - dest       R2 - cnt
+                      28     ;
+                      29     ; nie mozemy kopiowac bezposrednio z pamieci 
+                      30     ; do pamieci, wiec posluzymy sie akumulatorem
+                      31     ;----------------------------------------------------------------
+0025                  32     iram_iram:
+0025                  33     loopii:
+0025 E6               34             MOV             A, @r0                  ; wartosc pod adresem zrodlowym w R0 skopio
+                             wana do A
+0026 F7               35             MOV             @R1, A                  ; wartosc z A skopiowana pod adres w R1
+0027 08               36             INC     R0                              ; inkrementacja R0 i R1
+0028 09               37             INC             R1                              ;  - adresow w pamieci
+0029 DAFA             38             DJNZ    R2, loopii              ; dekrementacja R2, jesli nie 0, skok na poczatek p
+                             etli 
+002B 22               39             ret
+                      40     ;----------------------------------------------------------------
+                      41     ; kopiowanie bloku z pamieci wewnetrznej do zewnetrznej
+                      42     ; R0 - src      DPTR - dest     R2 - cnt
+                      43     ;
+                      44     ; nie mozemy kopiowac bezposrednio z pamieci wewnetrznej
+                      45     ; do zewnetrznej, wiec posluzymy sie akumulatorem
+                      46     ;----------------------------------------------------------------
+002C                  47     iram_xram:
+002C                  48     loopix:
+002C E6               49             MOV             A, @R0                  ; wartosc pod adresem zrodlowym w R0 skopio
+A51 MACRO ASSEMBLER  LAB2                                                                 03/26/2015 15:38:24 PAGE     2
+
+                             wana do A
+002D F0               50             MOVX    @DPTR, A                ; wartosc z A skopiowana pod adres w DPTR
+002E 08               51             INC             R0                              ; inkrementacja R0 i DPRT
+002F A3               52             INC             DPTR                    ;  - adresow w pamieciach wewnetrznej i zew
+                             netrznej
+0030 DAFA             53             DJNZ    R2, loopix              ; dekrementacja R2, jesli nie 0, skok na poczatek p
+                             etli
+0032 22               54             ret
+                      55     ;----------------------------------------------------------------
+                      56     ; liczenie niezerowych w pamieci wewnetrznej
+                      57     ; R0 - addr     R2 - cnt        
+                      58     ;----------------------------------------------------------------
+0033                  59     count_not_zeros:
+0033 781E             60             MOV             R0, #30                 ; idziemy po pamieci od 30
+0035 7A00             61             MOV             R2, #0                  ; poczatkowa wartosc licznika wynosi 0
+0037                  62     loopc:
+0037 E6               63             MOV             A, @R0                  ; wartosc pod adresem w R0 skopiowana do A
+0038 6001             64             JZ              continue                ; jesli = 0, nic nie rob; jesli nie, to:
+003A 0A               65             INC     R2                              ;  zwieksz licznik
+003B                  66     continue:
+003B 08               67             INC             R0                              ; inkrementacja adresu w R0
+003C E8               68             MOV     A, R0                   ; skopiowanie adresu do akumulatora
+003D 70F8             69             JNZ             loopc                   ; petla sie wykonuje, poki adres sie nie pr
+                             zepelni
+                      70                                                             ;  i z powroten nie wyzeruje
+003F 22               71             ret
+                      72     ;----------------------------------------------------------------
+                      73     ; kopiowanie bloku w obrebie pamieci zewnetrznej
+                      74     ; R3|R4 - src   R5|R6 - dest    R2 - cnt
+                      75     ;----------------------------------------------------------------
+0040                  76     xram_xram:
+0040                  77     loopxx:
+0040 8B82             78             MOV DPL, R3
+0042 8C83             79             MOV DPH, R4
+                      80             
+0044 E0               81             MOVX    A, @DPTR
+                      82             
+0045 A3               83             INC DPTR
+                      84             
+0046 AB82             85             MOV R3, DPL
+0048 AC83             86             MOV R4, DPH
+                      87             
+004A 8D82             88             MOV     DPL, R5
+004C 8E83             89             MOV     DPH, R6
+                      90             
+004E F0               91             MOVX @DPTR, A
+                      92             
+004F A3               93             INC DPTR
+                      94             
+0050 AD82             95             MOV     R5, DPL
+0052 AE83             96             MOV     R6, DPH 
+                      97             
+0054 DAEA             98             DJNZ    R2, loopxx              ; dekrementacja R2, jesli nie 0, skok na poczatek p
+                             etli
+0056 22               99             ret
+                     100     END
+A51 MACRO ASSEMBLER  LAB2                                                                 03/26/2015 15:38:24 PAGE     3
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+CONTINUE . . . . .  C ADDR   003BH   A   
+COUNT_NOT_ZEROS. .  C ADDR   0033H   A   
+DPH. . . . . . . .  D ADDR   0083H   A   
+DPL. . . . . . . .  D ADDR   0082H   A   
+IRAM_IRAM. . . . .  C ADDR   0025H   A   
+IRAM_XRAM. . . . .  C ADDR   002CH   A   
+LOOPC. . . . . . .  C ADDR   0037H   A   
+LOOPII . . . . . .  C ADDR   0025H   A   
+LOOPIX . . . . . .  C ADDR   002CH   A   
+LOOPXX . . . . . .  C ADDR   0040H   A   
+XRAM_XRAM. . . . .  C ADDR   0040H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

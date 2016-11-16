@@ -1,0 +1,275 @@
+A51 MACRO ASSEMBLER  LAB3PSX                                                              04/09/2015 17:58:29 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.00d
+OBJECT MODULE PLACED IN .\lab3psx.obj
+ASSEMBLER INVOKED BY: C:\Keil\C51\BIN\A51.EXE C:\Users\lab\Documents\swoj ten\lab3psx.asm SET(SMALL) DEBUG PRINT(.\lab3p
+                      sx.lst) OBJECT(.\lab3psx.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     $nomod51 
+                       2     ;$include (REG517.INC)
+                +1     3     ;-------------------------------------------------------------------------------
+                +1     4     ; Copyright 1995-1996 KEIL Software, Inc.
+                +1     5     ; 80517 Processor Declarations
+                +1     6     ;-------------------------------------------------------------------------------
+                +1     7  +1 $save 
+                +1   187  +1 $restore 
+                +1   188     
+                     189     
+                     190     
+  FF2C               191     WRCMD   EQU 0FF2CH
+  FF2D               192     WRDAT   EQU 0FF2DH
+  FF2E               193     RDSTAT  EQU 0FF2EH
+  FF2F               194     RDDAT   EQU 0FF2FH
+                     195     
+----                 196     CSEG AT 0
+0000 12003D          197             LCALL   init
+0003 7450            198             MOV             A, #'P'
+0005 120019          199             LCALL lcd_putch
+0008 7410            200             MOV             A, #16
+000A 12001D          201             LCALL wr_cmd
+000D 7453            202             MOV             A, #'S'
+000F 120019          203             LCALL lcd_putch
+0012 7458            204             MOV             A, #'X'
+0014 120019          205             LCALL lcd_putch         
+0017 80FE            206             SJMP    $
+                     207     
+                     208     ;--------------------------------------------------
+                     209     ; Wyswietlenie znaku            A - kod znaku
+                     210     ;--------------------------------------------------
+0019                 211     lcd_putch:
+0019 12002D          212             LCALL   wr_data
+001C 22              213             RET
+                     214     
+                     215     ;--------------------------------------------------
+                     216     ; Zapis komendy         A - kod komendy
+                     217     ;--------------------------------------------------
+001D                 218     wr_cmd:
+001D C0E0            219             PUSH    ACC     
+001F 90FF2E          220             MOV             DPTR, #RDSTAT
+                     221     
+0022                 222     c_busy:
+0022 E0              223             MOVX    A, @DPTR
+0023 20E7FC          224             JB              ACC.7, c_busy
+                     225     
+0026 D0E0            226             POP             ACC
+0028 90FF2C          227             MOV             DPTR, #WRCMD   
+002B F0              228             MOVX    @DPTR, A
+002C 22              229             RET
+                     230     
+                     231     ;--------------------------------------------------
+                     232     ; Zapis danych          A - dane
+                     233     ;--------------------------------------------------
+002D                 234     wr_data:
+002D C0E0            235             PUSH    ACC     
+002F 90FF2E          236             MOV             DPTR, #RDSTAT
+A51 MACRO ASSEMBLER  LAB3PSX                                                              04/09/2015 17:58:29 PAGE     2
+
+                     237     
+0032                 238     d_busy:
+0032 E0              239             MOVX    A, @DPTR
+0033 20E7FC          240             JB              ACC.7, d_busy
+                     241     
+0036 D0E0            242             POP             ACC
+0038 90FF2D          243             MOV             DPTR, #WRDAT   
+003B F0              244             MOVX    @DPTR, A
+003C 22              245             RET
+                     246     
+                     247     ;--------------------------------------------------
+003D                 248     init:
+003D 7401            249             MOV             A, #01H                 
+003F 12001D          250             LCALL   wr_cmd
+                     251     
+0042 740F            252             MOV             A, #0FH                 
+0044 12001D          253             LCALL   wr_cmd
+                     254     
+0047 22              255             RET
+0048 616C6100        256     text: DB 'ala', 0
+                     257     END
+A51 MACRO ASSEMBLER  LAB3PSX                                                              04/09/2015 17:58:29 PAGE     3
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+AC . . . . . . . .  B ADDR   00D0H.6 A   
+ACC. . . . . . . .  D ADDR   00E0H   A   
+ADCON0 . . . . . .  D ADDR   00D8H   A   
+ADCON1 . . . . . .  D ADDR   00DCH   A   
+ADDAT. . . . . . .  D ADDR   00D9H   A   
+ADEX . . . . . . .  B ADDR   00D8H.5 A   
+ADM. . . . . . . .  B ADDR   00D8H.3 A   
+ARCON. . . . . . .  D ADDR   00EFH   A   
+B. . . . . . . . .  D ADDR   00F0H   A   
+BD . . . . . . . .  B ADDR   00D8H.7 A   
+BSY. . . . . . . .  B ADDR   00D8H.4 A   
+CC4EN. . . . . . .  D ADDR   00C9H   A   
+CCEN . . . . . . .  D ADDR   00C1H   A   
+CCH1 . . . . . . .  D ADDR   00C3H   A   
+CCH2 . . . . . . .  D ADDR   00C5H   A   
+CCH3 . . . . . . .  D ADDR   00C7H   A   
+CCH4 . . . . . . .  D ADDR   00CFH   A   
+CCL1 . . . . . . .  D ADDR   00C2H   A   
+CCL2 . . . . . . .  D ADDR   00C4H   A   
+CCL3 . . . . . . .  D ADDR   00C6H   A   
+CCL4 . . . . . . .  D ADDR   00CEH   A   
+CLK. . . . . . . .  B ADDR   00D8H.6 A   
+CMEN . . . . . . .  D ADDR   00F6H   A   
+CMH0 . . . . . . .  D ADDR   00D3H   A   
+CMH1 . . . . . . .  D ADDR   00D5H   A   
+CMH2 . . . . . . .  D ADDR   00D7H   A   
+CMH3 . . . . . . .  D ADDR   00E3H   A   
+CMH4 . . . . . . .  D ADDR   00E5H   A   
+CMH5 . . . . . . .  D ADDR   00E7H   A   
+CMH6 . . . . . . .  D ADDR   00F3H   A   
+CMH7 . . . . . . .  D ADDR   00F5H   A   
+CML0 . . . . . . .  D ADDR   00D2H   A   
+CML1 . . . . . . .  D ADDR   00D4H   A   
+CML2 . . . . . . .  D ADDR   00D6H   A   
+CML3 . . . . . . .  D ADDR   00E2H   A   
+CML4 . . . . . . .  D ADDR   00E4H   A   
+CML5 . . . . . . .  D ADDR   00E6H   A   
+CML6 . . . . . . .  D ADDR   00F2H   A   
+CML7 . . . . . . .  D ADDR   00F4H   A   
+CMSEL. . . . . . .  D ADDR   00F7H   A   
+CRCH . . . . . . .  D ADDR   00CBH   A   
+CRCL . . . . . . .  D ADDR   00CAH   A   
+CTCON. . . . . . .  D ADDR   00E1H   A   
+CTRELH . . . . . .  D ADDR   00DFH   A   
+CTRELL . . . . . .  D ADDR   00DEH   A   
+CY . . . . . . . .  B ADDR   00D0H.7 A   
+C_BUSY . . . . . .  C ADDR   0022H   A   
+DAPR . . . . . . .  D ADDR   00DAH   A   
+DPH. . . . . . . .  D ADDR   0083H   A   
+DPL. . . . . . . .  D ADDR   0082H   A   
+DPSEL. . . . . . .  D ADDR   0092H   A   
+D_BUSY . . . . . .  C ADDR   0032H   A   
+EADC . . . . . . .  B ADDR   00B8H.0 A   
+EAL. . . . . . . .  B ADDR   00A8H.7 A   
+ES . . . . . . . .  B ADDR   00A8H.4 A   
+ET0. . . . . . . .  B ADDR   00A8H.1 A   
+ET1. . . . . . . .  B ADDR   00A8H.3 A   
+ET2. . . . . . . .  B ADDR   00A8H.5 A   
+EX0. . . . . . . .  B ADDR   00A8H.0 A   
+EX1. . . . . . . .  B ADDR   00A8H.2 A   
+A51 MACRO ASSEMBLER  LAB3PSX                                                              04/09/2015 17:58:29 PAGE     4
+
+EX2. . . . . . . .  B ADDR   00B8H.1 A   
+EX3. . . . . . . .  B ADDR   00B8H.2 A   
+EX4. . . . . . . .  B ADDR   00B8H.3 A   
+EX5. . . . . . . .  B ADDR   00B8H.4 A   
+EX6. . . . . . . .  B ADDR   00B8H.5 A   
+EXEN2. . . . . . .  B ADDR   00B8H.7 A   
+EXF2 . . . . . . .  B ADDR   00C0H.7 A   
+F0 . . . . . . . .  B ADDR   00D0H.5 A   
+F1 . . . . . . . .  B ADDR   00D0H.1 A   
+I2FR . . . . . . .  B ADDR   00C8H.5 A   
+I3FR . . . . . . .  B ADDR   00C8H.6 A   
+IADC . . . . . . .  B ADDR   00C0H.0 A   
+IE0. . . . . . . .  B ADDR   0088H.1 A   
+IE1. . . . . . . .  B ADDR   0088H.3 A   
+IEN0 . . . . . . .  D ADDR   00A8H   A   
+IEN1 . . . . . . .  D ADDR   00B8H   A   
+IEN2 . . . . . . .  D ADDR   009AH   A   
+IEX2 . . . . . . .  B ADDR   00C0H.1 A   
+IEX3 . . . . . . .  B ADDR   00C0H.2 A   
+IEX4 . . . . . . .  B ADDR   00C0H.3 A   
+IEX5 . . . . . . .  B ADDR   00C0H.4 A   
+IEX6 . . . . . . .  B ADDR   00C0H.5 A   
+INIT . . . . . . .  C ADDR   003DH   A   
+INT0 . . . . . . .  B ADDR   00B0H.2 A   
+INT1 . . . . . . .  B ADDR   00B0H.3 A   
+IP0. . . . . . . .  D ADDR   00A9H   A   
+IP1. . . . . . . .  D ADDR   00B9H   A   
+IRCON. . . . . . .  D ADDR   00C0H   A   
+IT0. . . . . . . .  B ADDR   0088H.0 A   
+IT1. . . . . . . .  B ADDR   0088H.2 A   
+LCD_PUTCH. . . . .  C ADDR   0019H   A   
+MD0. . . . . . . .  D ADDR   00E9H   A   
+MD1. . . . . . . .  D ADDR   00EAH   A   
+MD2. . . . . . . .  D ADDR   00EBH   A   
+MD3. . . . . . . .  D ADDR   00ECH   A   
+MD4. . . . . . . .  D ADDR   00EDH   A   
+MD5. . . . . . . .  D ADDR   00EEH   A   
+MX0. . . . . . . .  B ADDR   00D8H.0 A   
+MX1. . . . . . . .  B ADDR   00D8H.1 A   
+MX2. . . . . . . .  B ADDR   00D8H.2 A   
+OV . . . . . . . .  B ADDR   00D0H.2 A   
+P. . . . . . . . .  B ADDR   00D0H.0 A   
+P0 . . . . . . . .  D ADDR   0080H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+P3 . . . . . . . .  D ADDR   00B0H   A   
+P4 . . . . . . . .  D ADDR   00E8H   A   
+P5 . . . . . . . .  D ADDR   00F8H   A   
+P6 . . . . . . . .  D ADDR   00FAH   A   
+P7 . . . . . . . .  D ADDR   00DBH   A   
+P8 . . . . . . . .  D ADDR   00DDH   A   
+PCON . . . . . . .  D ADDR   0087H   A   
+PSW. . . . . . . .  D ADDR   00D0H   A   
+RB8. . . . . . . .  B ADDR   0098H.2 A   
+RD . . . . . . . .  B ADDR   00B0H.7 A   
+RDDAT. . . . . . .  N NUMB   FF2FH   A   
+RDSTAT . . . . . .  N NUMB   FF2EH   A   
+REN. . . . . . . .  B ADDR   0098H.4 A   
+RI . . . . . . . .  B ADDR   0098H.0 A   
+RS0. . . . . . . .  B ADDR   00D0H.3 A   
+RS1. . . . . . . .  B ADDR   00D0H.4 A   
+RXD. . . . . . . .  B ADDR   00B0H.0 A   
+S0BUF. . . . . . .  D ADDR   0099H   A   
+S0CON. . . . . . .  D ADDR   0098H   A   
+S1BUF. . . . . . .  D ADDR   009CH   A   
+S1CON. . . . . . .  D ADDR   009BH   A   
+A51 MACRO ASSEMBLER  LAB3PSX                                                              04/09/2015 17:58:29 PAGE     5
+
+S1REL. . . . . . .  D ADDR   009DH   A   
+SM0. . . . . . . .  B ADDR   0098H.7 A   
+SM1. . . . . . . .  B ADDR   0098H.6 A   
+SM2. . . . . . . .  B ADDR   0098H.5 A   
+SP . . . . . . . .  D ADDR   0081H   A   
+SWDT . . . . . . .  B ADDR   00B8H.6 A   
+T0 . . . . . . . .  B ADDR   00B0H.4 A   
+T1 . . . . . . . .  B ADDR   00B0H.5 A   
+T2CM . . . . . . .  B ADDR   00C8H.2 A   
+T2CON. . . . . . .  D ADDR   00C8H   A   
+T2I0 . . . . . . .  B ADDR   00C8H.0 A   
+T2I1 . . . . . . .  B ADDR   00C8H.1 A   
+T2PS . . . . . . .  B ADDR   00C8H.7 A   
+T2R0 . . . . . . .  B ADDR   00C8H.3 A   
+T2R1 . . . . . . .  B ADDR   00C8H.4 A   
+TB8. . . . . . . .  B ADDR   0098H.3 A   
+TCON . . . . . . .  D ADDR   0088H   A   
+TEXT . . . . . . .  C ADDR   0048H   A   
+TF0. . . . . . . .  B ADDR   0088H.5 A   
+TF1. . . . . . . .  B ADDR   0088H.7 A   
+TF2. . . . . . . .  B ADDR   00C0H.6 A   
+TH0. . . . . . . .  D ADDR   008CH   A   
+TH1. . . . . . . .  D ADDR   008DH   A   
+TH2. . . . . . . .  D ADDR   00CDH   A   
+TI . . . . . . . .  B ADDR   0098H.1 A   
+TL0. . . . . . . .  D ADDR   008AH   A   
+TL1. . . . . . . .  D ADDR   008BH   A   
+TL2. . . . . . . .  D ADDR   00CCH   A   
+TMOD . . . . . . .  D ADDR   0089H   A   
+TR0. . . . . . . .  B ADDR   0088H.4 A   
+TR1. . . . . . . .  B ADDR   0088H.6 A   
+TXD. . . . . . . .  B ADDR   00B0H.1 A   
+WDT. . . . . . . .  B ADDR   00A8H.6 A   
+WDTH . . . . . . .  D ADDR   0085H   A   
+WDTL . . . . . . .  D ADDR   0084H   A   
+WDTREL . . . . . .  D ADDR   0086H   A   
+WR . . . . . . . .  B ADDR   00B0H.6 A   
+WRCMD. . . . . . .  N NUMB   FF2CH   A   
+WRDAT. . . . . . .  N NUMB   FF2DH   A   
+WR_CMD . . . . . .  C ADDR   001DH   A   
+WR_DATA. . . . . .  C ADDR   002DH   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

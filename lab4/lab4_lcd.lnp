@@ -1,0 +1,3 @@
+".\lab4_lcd.obj" 
+TO "lab4_lcd" 
+RAMSIZE(256) 

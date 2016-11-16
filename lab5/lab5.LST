@@ -1,0 +1,397 @@
+A51 MACRO ASSEMBLER  LAB5                                                                 04/23/2015 20:31:27 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02b
+OBJECT MODULE PLACED IN lab5.OBJ
+ASSEMBLER INVOKED BY: E:\Keil_v5\C51\BIN\A51.EXE lab5.asm SET(SMALL) DEBUG EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ;---------------------------------------
+                       2     ; stale
+                       3     ;---------------------------------------
+                       4                                                                                     ; adresy do
+                             :
+  FF2C                 5     WR_CMD  EQU     0FF2CH                                          ; zapisu komendy
+  FF2D                 6     WR_DAT  EQU             0FF2DH                                          ; zapisu danych
+  FF2E                 7     RD_ST   EQU             0FF2EH                                          ; odczytu stanu
+  FF2F                 8     RD_DAT  EQU     0FF2FH                                          ; odczytu danych
+  0032                 9     TIME    EQU             50                                      ; odpowiada za 50ms, ktore 
+                             liczy timer
+  3CB0                10     LOAD    EQU             (65536-TIME*1000)       ; odpowiada za liczbe, ktora nalezy wsadzic
+                              do timera po wyzerowaniu
+                      11     
+  0030                12     COUNT   EQU             30H                                     ; nazwanie miejsca w pamiec
+                             i, w którym przechowujemy licznik 0,05s
+  0031                13     SEC             EQU             31H                                     ; nazwanie miejsca 
+                             w pamieci, w którym przechowujemy licznik sekund
+  0032                14     MIN             EQU             32H                                     ; nazwanie miejsca 
+                             w pamieci, w którym przechowujemy licznik minut
+  0033                15     HRS             EQU             33H                                     ; nazwanie miejsca 
+                             w pamieci, w którym przechowujemy licznik godzin
+                      16     
+  0000                17     SEC_F   EQU             0
+                      18     
+0000                  19     ORG 0
+0000 020040           20             LJMP    main
+                      21     ;-----------------------------------
+                      22     ; OBSLUGA PRZERWANIA
+                      23     ; na liczniku t0
+                      24     ;-----------------------------------
+000B                  25     ORG 0BH
+000B C0E0             26                     PUSH    ACC                                     ; zapamietanie - przeniesie
+                             nie na stos
+000D C0D0             27                     PUSH    PSW                                     ; akumulatora i banku rejes
+                             trow
+                      28     
+000F 758AB0           29                     MOV             TL0, #LOW(LOAD)         ; do licznika kopiujemy wartosc, od
+                              ktorej ma odmierzac czas
+0012 758C3C           30                     MOV             TH0, #HIGH(LOAD)        ; osobno starsza i mlodsza czesc ko
+                             piujemy
+                      31     
+0015 D53023           32                     DJNZ    COUNT, CONTINUE         ; zmiejszamy COUNT i skaczemy do CONTINUE, 
+                             jesli nie zero
+0018 753014           33                     MOV     COUNT, #20                      ; jesli jednak zero, przywracamy mu
+                              wartosc 20
+001B 0531             34                     INC     SEC                                     ; zwiekszamy licznik sekund
+001D D200             35                     SETB    SEC_F
+001F E531             36                     MOV             A, SEC                          ; dla porownania kopiujemy 
+                             jego wartosc do akumulatora
+0021 B43C17           37                     CJNE    A, #60, CONTINUE        ; i jesli nie jest rowny 60, to skaczemy do
+                              CONTINUE
+0024 753100           38                     MOV             SEC, #0                         ; jesli jednak 60, to zmien
+                             iamy na 0
+0027 0532             39                     INC     MIN                                     ; zwiekszamy licznik minut
+0029 E532             40                     MOV             A, MIN                          ; dla porownania kopiujemy 
+                             jego wartosc do akumulatora
+002B B43C0D           41                     CJNE    A, #60, CONTINUE        ; i jesli nie jest rowny 60, to skaczemy do
+A51 MACRO ASSEMBLER  LAB5                                                                 04/23/2015 20:31:27 PAGE     2
+
+                              CONTINUE
+002E 753200           42                     MOV             MIN, #0                         ; jesli jednak 60, to zmien
+                             iamy na 0
+0031 0533             43                     INC             HRS                                     ; zwiekszamy liczni
+                             k godzin
+0033 E533             44                     MOV             A, HRS                          ; dla porownania kopiujemy 
+                             jego wartosc do akumulatora
+0035 B41803           45                     CJNE    A, #24, CONTINUE        ; i jesli nie jest rowny 24, to skaczemy do
+                              CONTINUE
+0038 753300           46                     MOV             HRS, #0                         ; jesli jednak 24, to zmien
+                             iamy na 0
+                      47                     
+003B                  48     CONTINUE:
+003B D0D0             49                     POP             PSW                                     ; prywracamy ze sto
+                             su bank rejestrow i akumulator
+003D D0E0             50                     POP             ACC                                     ; w odwrotnej kolej
+                             nosci, niz wrzucalismy na stos
+003F 32               51                     RETI                                            ; koniec przerwania
+0040                  52     main:
+0040 1200DF           53             lcall   INIT_TIMER
+0043 120117           54             LCALL   init                            ; na poczatek inicjujemy timer
+                      55     
+0046                  56     main_loop:
+0046 3000FD           57             JNB             SEC_F,$
+0049 C200             58             CLR             SEC_F
+004B 120050           59             LCALL   showTime
+004E 80F6             60             SJMP    main_loop                               ; powrót do poczatku petli
+                      61     
+                      62     ;-----------------------------------
+                      63     ; SHOW SECONDS  A - SEKUNDY
+                      64     ;-----------------------------------
+0050                  65     showTime:
+0050 E531             66                     MOV             A, SEC                          ; dla porownania kopiujemy 
+                             jego wartosc do akumulatora
+0052 120060           67                     lcall   showSeconds
+0055 E532             68                     MOV             A, MIN                          ; dla porownania kopiujemy 
+                             jego wartosc do akumulatora
+0057 12008C           69                     lcall   showMinutes
+005A E533             70                     MOV             A, HRS                          ; dla porownania kopiujemy 
+                             jego wartosc do akumulatora
+005C 1200B8           71                     lcall   showHours
+005F 22               72                     RET
+                      73     
+                      74     ;-----------------------------------
+                      75     ; SHOW SECONDS  A - SEKUNDY
+                      76     ;-----------------------------------
+0060                  77     showSeconds:
+0060 C0E0             78             push acc
+0062 B43C02           79             cjne A, #60, contsec
+0065 7400             80             mov A, #0
+0067                  81     contsec:
+0067 75F00A           82             mov b, #10
+006A 84               83             div ab  
+006B 2430             84             add a, #'0'
+                      85             
+006D C0E0             86             push acc
+006F 7406             87             mov a, #6
+0071 1200FF           88             lcall   lcdGoTo ; kursor na 6 miejscu
+0074 D0E0             89             pop acc
+                      90     
+0076 120144           91             lcall wrDat
+0079 E5F0             92             mov a, b
+007B 2430             93             add a, #'0'
+                      94     
+007D C0E0             95             push acc
+007F 7407             96             mov a, #7
+A51 MACRO ASSEMBLER  LAB5                                                                 04/23/2015 20:31:27 PAGE     3
+
+0081 1200FF           97             lcall   lcdGoTo ; kursor na 7 miejscu
+0084 D0E0             98             pop acc
+                      99     
+0086 120144          100             lcall wrDat
+                     101     
+0089 D0E0            102             pop acc
+008B 22              103             RET
+                     104     ;-----------------------------------
+                     105     ; SHOW MINUTES  A - MINUTY
+                     106     ;-----------------------------------
+008C                 107     showMinutes:
+008C C0E0            108             push acc
+                     109     
+008E B43C02          110             cjne A, #60, contmin
+0091 7400            111             mov A, #0
+0093                 112     contmin:
+                     113             
+0093 75F00A          114             mov b, #10
+0096 84              115             div ab  
+0097 2430            116             add a, #'0'
+                     117             
+0099 C0E0            118             push acc
+009B 7403            119             mov a, #3
+009D 1200FF          120             lcall   lcdGoTo ; kursor na 3 miejscu
+00A0 D0E0            121             pop acc
+                     122     
+00A2 120144          123             lcall wrDat
+00A5 E5F0            124             mov a, b
+00A7 2430            125             add a, #'0'
+                     126     
+00A9 C0E0            127             push acc
+00AB 7404            128             mov a, #4
+00AD 1200FF          129             lcall   lcdGoTo ; kursor na 4 miejscu
+00B0 D0E0            130             pop acc
+                     131     
+00B2 120144          132             lcall wrDat
+                     133     
+00B5 D0E0            134             pop acc
+00B7 22              135             RET
+                     136     ;-----------------------------------
+                     137     ; SHOW HOURS    A - GODZINY
+                     138     ;-----------------------------------
+00B8                 139     showHours:
+00B8 C0E0            140             push acc
+                     141             
+00BA 75F00A          142             mov b, #10
+00BD 84              143             div ab  
+00BE 2430            144             add a, #'0'
+                     145             
+00C0 C0E0            146             push acc
+00C2 7400            147             mov a, #0
+00C4 1200FF          148             lcall   lcdGoTo ; kursor na 0 miejscu
+00C7 D0E0            149             pop acc
+                     150     
+00C9 120144          151             lcall wrDat
+00CC E5F0            152             mov a, b
+00CE 2430            153             add a, #'0'
+                     154     
+00D0 C0E0            155             push acc
+00D2 7401            156             mov a, #1
+00D4 1200FF          157             lcall   lcdGoTo ; kursor na 1 miejscu
+00D7 D0E0            158             pop acc
+                     159     
+00D9 120144          160             lcall wrDat
+                     161     
+00DC D0E0            162             pop acc
+A51 MACRO ASSEMBLER  LAB5                                                                 04/23/2015 20:31:27 PAGE     4
+
+00DE 22              163             RET
+                     164     ;-----------------------------------
+                     165     ; INIT TIMER
+                     166     ;-----------------------------------
+00DF                 167     INIT_TIMER:
+00DF 753100          168                     MOV             SEC, #0                         ; zerowanie licznika sekund
+00E2 753200          169                     MOV             MIN, #0                         ; zerowanie licznika minut
+00E5 753300          170                     MOV             HRS, #0                         ; zerowanie licznika godzin
+00E8 753014          171                     MOV             COUNT, #20                      ; w liczniku 20 - 20*50ms=1
+                             s
+                     172     
+                     173     
+00EB C28C            174                     CLR             TR0                                     ; czyscimy TR0
+00ED 758901          175                     MOV             TMOD, #1                        ; ustawiamy tryb na 1
+00F0 758AB0          176                     MOV             TL0, #LOW(LOAD)         ; do licznika kopiujemy wartosc, od
+                              ktorej ma odmierzac czas
+00F3 758C3C          177                     MOV             TH0, #HIGH(LOAD)        ; osobno starsza i mlodsza czesc ko
+                             piujemy
+                     178     
+00F6 D2A9            179                     SETB    ET0                                     ; ustawiamy bity ET0
+00F8 D2AF            180                     SETB    EA                                      ; i EA
+                     181     
+00FA C28D            182                     CLR             TF0                                     ; czyscimy flage TF
+                             0
+00FC D28C            183                     SETB    TR0                                     ; startujemy timer T0
+                     184                     
+00FE 22              185                     RET
+                     186     ;---------------------------------------
+                     187     ; GOTO   A - POZYCJA KURSORA
+                     188     ;---------------------------------------
+00FF                 189     lcdGoTo:
+00FF D2E7            190             SETB    ACC.7                                           ; modyfikacja 7 bitu dla ko
+                             mendy 
+                     191                                                                                     ; set DD RA
+                             M Address
+0101 120128          192             LCALL   cBusy                                           ; zaczekanie, az wyswietlac
+                             z nei bedzie zajety
+0104 120131          193             LCALL   wrCmd                                           ; wyslanie komendy
+0107 22              194             RET
+                     195     ;---------------------------------------
+                     196     ; PUT STRING     DPTR - string, R1- licznik
+                     197     ;---------------------------------------
+0108                 198     putStr:
+0108 C0E0            199             PUSH    ACC                                                     ; zachowanie zawart
+                             osci akumulatora
+010A                 200     putStrLoop:
+010A E4              201             CLR             A                                                       ; wyzerowan
+                             ie akumulatora
+010B 93              202             MOVC    A,@A+DPTR                                       ; skopiowanie elementu spod
+                              adresu w dptr
+010C 6006            203             JZ              continuelcd                                     ; jesli 0, to konie
+                             c
+010E 120144          204             LCALL   wrDat                                           ; wywolanie wypisania na ek
+                             ranie znaku
+0111 A3              205             INC             DPTR                                            ; zwiekszenie adres
+                             u w dptr
+0112 80F6            206             JMP             putStrLoop                                      ; powrot do oczatku
+                              petli
+0114                 207     continuelcd:    
+0114 D0E0            208             POP ACC
+0116 22              209             RET
+                     210     ;---------------------------------------
+                     211     ; INIT LCD
+                     212     ;---------------------------------------
+0117                 213     init:
+0117 7438            214             MOV             A, #038H
+A51 MACRO ASSEMBLER  LAB5                                                                 04/23/2015 20:31:27 PAGE     5
+
+0119 120131          215             LCALL   wrCmd
+011C 7401            216             MOV             A, #01H                 
+011E 120131          217             LCALL   wrCmd
+0121 900166          218             MOV             DPTR, #czas
+0124 120108          219             LCALL   putStr
+0127 22              220             RET
+                     221     ;---------------------------------------
+                     222     ; SPRAWDZENIE CZY ZAJETY
+                     223     ;---------------------------------------
+0128                 224     cBusy:
+0128 C0E0            225             PUSH    ACC                                                     ; zachowanie akumul
+                             atora
+012A                 226     cBusy_w:
+012A E0              227             MOVX    A, @DPTR                                        ; sprawdenie czy zajety prz
+                             ez
+012B 20E7FC          228             JB              ACC.7, cBusy_w                          ;  sprawdzenie 7 bitu stanu
+012E D0E0            229             POP             ACC
+0130 22              230             RET
+                     231     ;---------------------------------------
+                     232     ; WYSLANIE KOMENDY        A - komenda
+                     233     ;---------------------------------------
+0131                 234     wrCmd:
+0131 C082            235             PUSH    DPL                                                     ; zachowanie dptr
+0133 C083            236             PUSH    DPH
+0135 90FF2E          237             MOV             DPTR, #RD_ST                            ; RD_ST do dptr, by odczyta
+                             c stan
+0138 120128          238             LCALL   cBusy                                           ; i sprawdzenie, czy zajety
+013B 90FF2C          239             MOV             DPTR, #WR_CMD                           ; WR_CMD do dptr
+013E F0              240             MOVX    @DPTR, A                                        ; komenda z akumulatora pod
+                              adres z dptr
+013F D083            241             POP             DPH
+0141 D082            242             POP             DPL
+0143 22              243             RET
+                     244     ;---------------------------------------
+                     245     ; WYSLANIE DANYCH         A - dane
+                     246     ;---------------------------------------
+0144                 247     wrDat:
+0144 C082            248             PUSH    DPL     
+0146 C083            249             PUSH    DPH
+0148 90FF2E          250             MOV             DPTR, #RD_ST
+014B 120128          251             LCALL   cBusy
+014E 90FF2D          252             MOV             DPTR, #WR_DAT                           ; to samo, co powyzej, tylk
+                             o zamiast
+0151 F0              253             MOVX    @DPTR, A                                        ; WR_CMD jest WR_DAT
+0152 D083            254             POP             DPH
+0154 D082            255             POP             DPL
+0156 22              256             RET
+                     257     ;---------------------------------------
+                     258     ; ODCZYT STANU    A - stan
+                     259     ;---------------------------------------
+0157                 260     rdCmd:
+0157 C0E0            261             PUSH    ACC                                                     ; zachowanie akumul
+                             atora
+0159 90FF2E          262             MOV             DPTR, #RD_ST                            ; RD_ST do dptr
+015C 120128          263             LCALL   cBusy                                           ; sprawdzenie, czy zajety
+015F D0E0            264             POP             ACC
+0161 90FF2E          265             MOV             DPTR, #RD_ST                            ; znów RD_ST
+0164 E0              266             MOVX    A, @DPTR                                        ; stan do akumulatora
+0165 22              267             RET
+                     268     
+0166                 269     czas:
+0166 30303A30        270             DB '00:00:00',0
+016A 303A3030                
+016E 00                      
+                     271     
+                     272     END
+A51 MACRO ASSEMBLER  LAB5                                                                 04/23/2015 20:31:27 PAGE     6
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+B. . . . . . . . .  D ADDR   00F0H   A   
+CBUSY. . . . . . .  C ADDR   0128H   A   
+CBUSY_W. . . . . .  C ADDR   012AH   A   
+CONTINUE . . . . .  C ADDR   003BH   A   
+CONTINUELCD. . . .  C ADDR   0114H   A   
+CONTMIN. . . . . .  C ADDR   0093H   A   
+CONTSEC. . . . . .  C ADDR   0067H   A   
+COUNT. . . . . . .  N NUMB   0030H   A   
+CZAS . . . . . . .  C ADDR   0166H   A   
+DPH. . . . . . . .  D ADDR   0083H   A   
+DPL. . . . . . . .  D ADDR   0082H   A   
+EA . . . . . . . .  B ADDR   00A8H.7 A   
+ET0. . . . . . . .  B ADDR   00A8H.1 A   
+HRS. . . . . . . .  N NUMB   0033H   A   
+INIT . . . . . . .  C ADDR   0117H   A   
+INIT_TIMER . . . .  C ADDR   00DFH   A   
+LCDGOTO. . . . . .  C ADDR   00FFH   A   
+LOAD . . . . . . .  N NUMB   3CB0H   A   
+MAIN . . . . . . .  C ADDR   0040H   A   
+MAIN_LOOP. . . . .  C ADDR   0046H   A   
+MIN. . . . . . . .  N NUMB   0032H   A   
+PSW. . . . . . . .  D ADDR   00D0H   A   
+PUTSTR . . . . . .  C ADDR   0108H   A   
+PUTSTRLOOP . . . .  C ADDR   010AH   A   
+RDCMD. . . . . . .  C ADDR   0157H   A   
+RD_DAT . . . . . .  N NUMB   FF2FH   A   
+RD_ST. . . . . . .  N NUMB   FF2EH   A   
+SEC. . . . . . . .  N NUMB   0031H   A   
+SEC_F. . . . . . .  N NUMB   0000H   A   
+SHOWHOURS. . . . .  C ADDR   00B8H   A   
+SHOWMINUTES. . . .  C ADDR   008CH   A   
+SHOWSECONDS. . . .  C ADDR   0060H   A   
+SHOWTIME . . . . .  C ADDR   0050H   A   
+TF0. . . . . . . .  B ADDR   0088H.5 A   
+TH0. . . . . . . .  D ADDR   008CH   A   
+TIME . . . . . . .  N NUMB   0032H   A   
+TL0. . . . . . . .  D ADDR   008AH   A   
+TMOD . . . . . . .  D ADDR   0089H   A   
+TR0. . . . . . . .  B ADDR   0088H.4 A   
+WRCMD. . . . . . .  C ADDR   0131H   A   
+WRDAT. . . . . . .  C ADDR   0144H   A   
+WR_CMD . . . . . .  N NUMB   FF2CH   A   
+WR_DAT . . . . . .  N NUMB   FF2DH   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

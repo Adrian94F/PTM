@@ -1,0 +1,165 @@
+A51 MACRO ASSEMBLER  LAB3_TIMER                                                           04/08/2015 20:31:21 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02b
+OBJECT MODULE PLACED IN lab3-timer.OBJ
+ASSEMBLER INVOKED BY: E:\Keil_v5\C51\BIN\A51.EXE lab3-timer.asm SET(SMALL) DEBUG EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ;-----------------------------------
+                       2     ; STALE
+                       3     ;-----------------------------------
+  0032                 4     TIME    EQU             50                                      ; odpowiada za 50ms, ktore 
+                             liczy timer
+  3CB0                 5     LOAD    EQU             (65536-TIME*1000)       ; odpowiada za liczbe, ktora nalezy wsadzic
+                              do timera po wyzerowaniu
+  0030                 6     COUNT   EQU             30H                                     ; nazwanie miejsca w pamiec
+                             i, w którym przechowujemy licznik 0,05s
+  0031                 7     SEC             EQU             31H                                     ; nazwanie miejsca 
+                             w pamieci, w którym przechowujemy licznik sekund
+  0032                 8     MIN             EQU             32H                                     ; nazwanie miejsca 
+                             w pamieci, w którym przechowujemy licznik minut
+  0033                 9     HRS             EQU             33H                                     ; nazwanie miejsca 
+                             w pamieci, w którym przechowujemy licznik godzin
+0000                  10     ORG 0
+0000 803C             11                     JMP     START                           ; skok do startu, 
+                      12                                                                             ; najpierw zdefiniu
+                             jemy obsluge przerwania
+                      13                                                                             
+                      14     ;-----------------------------------
+                      15     ; OBSLUGA PRZERWANIA
+                      16     ; na liczniku t0
+                      17     ;-----------------------------------
+000B                  18     ORG 0BH
+000B C0E0             19                     PUSH    ACC                                     ; zapamietanie - przeniesie
+                             nie na stos
+000D C0D0             20                     PUSH    PSW                                     ; akumulatora i banku rejes
+                             trow
+                      21     
+000F 758AB0           22                     MOV             TL0, #LOW(LOAD)         ; do licznika kopiujemy wartosc, od
+                              ktorej ma odmierzac czas
+0012 758C3C           23                     MOV             TH0, #HIGH(LOAD)        ; osobno starsza i mlodsza czesc ko
+                             piujemy
+                      24     
+0015 D53021           25                     DJNZ    COUNT, CONTINUE         ; zmiejszamy COUNT i skaczemy do CONTINUE, 
+                             jesli nie zero
+0018 753014           26                     MOV     COUNT, #20                      ; jesli jednak zero, przywracamy mu
+                              wartosc 20
+001B 0531             27                     INC     SEC                                     ; zwiekszamy licznik sekund
+001D E531             28                     MOV             A, SEC                          ; dla porownania kopiujemy 
+                             jego wartosc do akumulatora
+001F B43C17           29                     CJNE    A, #60, CONTINUE        ; i jesli nie jest rowny 60, to skaczemy do
+                              CONTINUE
+0022 753100           30                     MOV             SEC, #0                         ; jesli jednak 60, to zmien
+                             iamy na 0
+0025 0532             31                     INC     MIN                                     ; zwiekszamy licznik minut
+0027 E532             32                     MOV             A, MIN                          ; dla porownania kopiujemy 
+                             jego wartosc do akumulatora
+0029 B43C0D           33                     CJNE    A, #60, CONTINUE        ; i jesli nie jest rowny 60, to skaczemy do
+                              CONTINUE
+002C 753200           34                     MOV             MIN, #0                         ; jesli jednak 60, to zmien
+                             iamy na 0
+002F 0533             35                     INC             HRS                                     ; zwiekszamy liczni
+                             k godzin
+0031 E533             36                     MOV             A, HRS                          ; dla porownania kopiujemy 
+                             jego wartosc do akumulatora
+0033 B41803           37                     CJNE    A, #24, CONTINUE        ; i jesli nie jest rowny 24, to skaczemy do
+A51 MACRO ASSEMBLER  LAB3_TIMER                                                           04/08/2015 20:31:21 PAGE     2
+
+                              CONTINUE
+0036 753300           38                     MOV             HRS, #0                         ; jesli jednak 24, to zmien
+                             iamy na 0
+                      39                     
+0039                  40     CONTINUE:
+0039 D0D0             41                     POP             PSW                                     ; prywracamy ze sto
+                             su bank rejestrow i akumulator
+003B D0E0             42                     POP             ACC                                     ; w odwrotnej kolej
+                             nosci, niz wrzucalismy na stos
+003D 32               43                     RETI                                            ; koniec przerwania
+                      44                     
+                      45     ;-----------------------------------
+                      46     ; WLASCIWY PROGRAM
+                      47     ;-----------------------------------
+003E                  48     START:
+003E 120052           49                     LCALL   INIT_TIMER                      ; na poczatek inicjujemy timer
+                      50     
+0041 E531             51     LOOP:   MOV             A,SEC                           ; nieskonczona petla do wyswietlani
+                             a sekund, minut i godzin
+                      52                                                                             ; sekundy  do akumu
+                             latora
+0043 F4               53                     CPL             A                                       ; zanegowane
+0044 F590             54                     MOV             P1,A                            ; i wyswietlone na P1
+0046 E532             55                     MOV             A,MIN                           ; minuty skopiowane do akum
+                             ulatora
+0048 F4               56                     CPL             A                                       ; zanegowane
+0049 F5A0             57                     MOV             P2,A                            ; i wyswietlone na P2
+004B E533             58                     MOV             A,HRS                           ; minuty skopiowane do akum
+                             ulatora
+004D F4               59                     CPL             A                                       ; zanegowane
+004E F5B0             60                     MOV             P3,A                            ; i wyswietlone na P3
+                      61                     
+0050 80EF             62                     SJMP    LOOP                            ; powrót do poczatku petli
+                      63     
+                      64     ;-----------------------------------
+0052                  65     INIT_TIMER:
+0052 753100           66                     MOV             SEC, #0                         ; zerowanie licznika sekund
+0055 753200           67                     MOV             MIN, #0                         ; zerowanie licznika minut
+0058 753300           68                     MOV             HRS, #0                         ; zerowanie licznika godzin
+005B 753014           69                     MOV             COUNT, #20                      ; w liczniku 20 - 20*50ms=1
+                             s
+                      70     
+                      71     
+005E C28C             72                     CLR             TR0                                     ; czyscimy TR0
+0060 758901           73                     MOV             TMOD, #1                        ; ustawiamy tryb na 1
+0063 758AB0           74                     MOV             TL0, #LOW(LOAD)         ; do licznika kopiujemy wartosc, od
+                              ktorej ma odmierzac czas
+0066 758C3C           75                     MOV             TH0, #HIGH(LOAD)        ; osobno starsza i mlodsza czesc ko
+                             piujemy
+                      76     
+0069 D2A9             77                     SETB    ET0                                     ; ustawiamy bity ET0
+006B D2AF             78                     SETB    EA                                      ; i EA
+                      79     
+006D C28D             80                     CLR             TF0                                     ; czyscimy flage TF
+                             0
+006F D28C             81                     SETB    TR0                                     ; startujemy timer T0
+                      82                     
+0071 22               83                     RET
+                      84     
+                      85     END
+A51 MACRO ASSEMBLER  LAB3_TIMER                                                           04/08/2015 20:31:21 PAGE     3
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+CONTINUE . . . . .  C ADDR   0039H   A   
+COUNT. . . . . . .  N NUMB   0030H   A   
+EA . . . . . . . .  B ADDR   00A8H.7 A   
+ET0. . . . . . . .  B ADDR   00A8H.1 A   
+HRS. . . . . . . .  N NUMB   0033H   A   
+INIT_TIMER . . . .  C ADDR   0052H   A   
+LOAD . . . . . . .  N NUMB   3CB0H   A   
+LOOP . . . . . . .  C ADDR   0041H   A   
+MIN. . . . . . . .  N NUMB   0032H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+P3 . . . . . . . .  D ADDR   00B0H   A   
+PSW. . . . . . . .  D ADDR   00D0H   A   
+SEC. . . . . . . .  N NUMB   0031H   A   
+START. . . . . . .  C ADDR   003EH   A   
+TF0. . . . . . . .  B ADDR   0088H.5 A   
+TH0. . . . . . . .  D ADDR   008CH   A   
+TIME . . . . . . .  N NUMB   0032H   A   
+TL0. . . . . . . .  D ADDR   008AH   A   
+TMOD . . . . . . .  D ADDR   0089H   A   
+TR0. . . . . . . .  B ADDR   0088H.4 A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)
